@@ -44,7 +44,7 @@ hAI.OpenHumanCoreLAN/
 ├─ example.env            # Beispiel-Env für schnelles Starten
 ├─ compose.override.yml   # Lokale Overrides (optional)
 ├─ .gitignore             # Ignore-Regeln für Git
-└─ banner.svg             # Einfaches Repo-Banner/Icon
+└─ docs                   # html seite
 ```
 
 ---
