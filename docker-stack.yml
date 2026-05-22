@@ -1,0 +1,99 @@
+# ============================================================
+# OpenHuman Core — Portainer Stack für LAN-Betrieb
+# inkl. Docker-Healthcheck und Watchdog-Sidecar
+# ============================================================
+
+version: "3.9"
+
+services:
+
+  openhuman-core:
+    image: ghcr.io/tinyhumansai/openhuman-core:latest
+    container_name: openhuman-core
+    restart: unless-stopped
+
+    ports:
+      - "${OPENHUMAN_CORE_PORT:-7788}:7788"
+
+    environment:
+      OPENHUMAN_CORE_HOST: "0.0.0.0"
+      OPENHUMAN_CORE_PORT: "7788"
+      OPENHUMAN_WORKSPACE: "/home/openhuman/.openhuman"
+      OPENHUMAN_CORE_TOKEN: "${OPENHUMAN_CORE_TOKEN}"
+      BACKEND_URL: "${BACKEND_URL:-https://api.tinyhumans.ai}"
+      RUST_LOG: "${RUST_LOG:-info}"
+      RUST_BACKTRACE: "${RUST_BACKTRACE:-0}"
+      OPENHUMAN_MODEL: "${OPENHUMAN_MODEL:-}"
+      OPENHUMAN_TEMPERATURE: "${OPENHUMAN_TEMPERATURE:-0.7}"
+      OPENHUMAN_WEB_SEARCH_MAX_RESULTS: "${OPENHUMAN_WEB_SEARCH_MAX_RESULTS:-5}"
+      OPENHUMAN_ANALYTICS_ENABLED: "${OPENHUMAN_ANALYTICS_ENABLED:-false}"
+
+    volumes:
+      - openhuman-workspace:/home/openhuman/.openhuman
+
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "http://localhost:7788/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+
+    networks:
+      - openhuman-net
+
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "2.0"
+        reservations:
+          memory: 256M
+
+    labels:
+      - "com.portainer.stack=hAI.OpenHumanCoreLAN"
+      - "traefik.enable=false"
+
+  openhuman-watchdog:
+    image: alpine:latest
+    container_name: openhuman-watchdog
+    restart: unless-stopped
+    depends_on:
+      openhuman-core:
+        condition: service_healthy
+
+    command: >
+      sh -c "
+        echo '[watchdog] Starte Health-Monitoring für openhuman-core...' &&
+        while true; do
+          TIMESTAMP=$$(date '+%Y-%m-%d %H:%M:%S');
+          RESPONSE=$$(wget -q -O- --timeout=5 http://openhuman-core:7788/health 2>&1);
+          STATUS=$$?;
+          if [ $$STATUS -eq 0 ]; then
+            echo \"[watchdog] $${TIMESTAMP} OK — $${RESPONSE}\";
+          else
+            echo \"[watchdog] $${TIMESTAMP} FEHLER — Core nicht erreichbar (Exit: $${STATUS})\";
+          fi;
+          sleep 30;
+        done
+      "
+
+    networks:
+      - openhuman-net
+
+    deploy:
+      resources:
+        limits:
+          memory: 32M
+          cpus: "0.1"
+
+    labels:
+      - "com.portainer.stack=hAI.OpenHumanCoreLAN"
+
+volumes:
+  openhuman-workspace:
+    name: openhuman-workspace
+
+networks:
+  openhuman-net:
+    name: openhuman-net
+    driver: bridge
