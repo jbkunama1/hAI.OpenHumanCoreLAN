@@ -340,37 +340,6 @@ Alle nennenswerten Änderungen an **hAI.OpenHumanCoreLAN** werden hier dokumenti
 - MIT-Lizenz
 ```
 
----
-
-## 🙈 `.gitignore` (Auszug)
-
-```gitignore
-# Node / frontend
-node_modules/
-*.log
-
-# Python
-__pycache__/
-*.py[cod]
-
-# OS
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-
-# Docker / Secrets
-.env
-.env.*
-*.tar
-*.tar.gz
-*.zip
-
-# Sonstiges
-output/
-```
 
 ---
 
