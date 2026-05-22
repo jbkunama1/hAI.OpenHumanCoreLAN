@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>hAI.OpenHumanCoreLAN — OpenHuman Core im LAN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- GitHub-Pages-kompatible Basis-Styles (einfaches, helles Theme) -->
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #0f172a;
+      --bg-light: #f9fafb;
+      --fg: #0f172a;
+      --fg-muted: #4b5563;
+      --accent: #2496ed;
+      --accent-soft: #e0f2fe;
+      --border: #e5e7eb;
+      --code-bg: #0b1120;
+      --code-fg: #e5e7eb;
+      --card-bg: #ffffff;
+      --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.12);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top left, #e0f2fe, #f9fafb 45%, #eef2ff);
+      color: var(--fg);
+      line-height: 1.5;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    /* Layout */
+    .page {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 32px 16px 64px;
+    }
+
+    header.hero {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .hero-logo {
+      flex: 0 0 120px;
+      height: 120px;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow-soft);
+      background: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hero-text {
+      flex: 1 1 260px;
+    }
+
+    .hero-title {
+      font-size: clamp(1.9rem, 2.2vw + 1.4rem, 2.4rem);
+      margin: 0 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hero-subtitle {
+      margin: 0 0 12px;
+      color: var(--fg-muted);
+      font-size: 0.98rem;
+    }
+
+    .hero-highlight {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      font-size: 0.9rem;
+      box-shadow: 0 8px 18px rgba(148, 163, 184, 0.25);
+    }
+
+    .badge-row {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* Main content card */
+    .card {
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: var(--radius-lg);
+      padding: 24px 22px 28px;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    h2 {
+      margin-top: 28px;
+      margin-bottom: 12px;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h3 {
+      margin-top: 20px;
+      margin-bottom: 8px;
+      font-size: 1.05rem;
+    }
+
+    p {
+      margin: 0 0 10px;
+      color: var(--fg-muted);
+      font-size: 0.98rem;
+    }
+
+    ul, ol {
+      padding-left: 1.1rem;
+      margin-top: 0;
+      margin-bottom: 10px;
+      color: var(--fg-muted);
+      font-size: 0.97rem;
+    }
+
+    li + li {
+      margin-top: 2px;
+    }
+
+    blockquote {
+      margin: 0 0 16px;
+      padding: 10px 14px;
+      border-left: 3px solid var(--accent);
+      background: var(--accent-soft);
+      border-radius: 0 12px 12px 0;
+      font-size: 0.95rem;
+      color: #1e293b;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 8px 0 16px;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 6px 8px;
+      text-align: left;
+    }
+
+    th {
+      background: #f3f4f6;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) td {
+      background: #f9fafb;
+    }
+
+    pre {
+      background: var(--code-bg);
+      color: var(--code-fg);
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      font-size: 0.85rem;
+      margin: 6px 0 12px;
+      border: 1px solid rgba(15, 23, 42, 0.55);
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+    }
+
+    code {
+      background: rgba(15, 23, 42, 0.06);
+      padding: 1px 4px;
+      border-radius: 4px;
+      font-size: 0.86rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      background: rgba(148, 163, 184, 0.16);
+      color: #0f172a;
+    }
+
+    footer {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    @media (max-width: 640px) {
+      .card {
+        padding: 18px 16px 24px;
+      }
+
+      .hero {
+        text-align: left;
+      }
+
+      .hero-logo {
+        margin: 0 auto;
+      }
+    }
+  </style>
+
+  <!-- Mermaid für Diagramm -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({ startOnLoad: true, theme: "neutral" });
+  </script>
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-logo">
+        <!-- Ersetze src ggf. durch den Pfad zu deinem generierten Logo -->
+        <img src="banner.svg" alt="hAI.OpenHumanCoreLAN Logo">
+      </div>
+      <div class="hero-text">
+        <h1 class="hero-title">
+          🚀 hAI.OpenHumanCoreLAN
+        </h1>
+        <p class="hero-subtitle">
+          OpenHuman Core als Docker-Stack in Portainer – sauber im LAN betrieben, mit Healthchecks und Watchdog.
+        </p>
+        <div class="hero-highlight">
+          <span>🧠 OpenHuman Core im LAN</span>
+          <span class="pill">🐳 Portainer Stack</span>
+          <span class="pill">❤️ Healthcheck + Watchdog</span>
+        </div>
+        <div class="badge-row">
+          <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License Badge">
+          <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=flat&logo=docker&logoColor=white" alt="Docker Compose Badge">
+          <img src="https://img.shields.io/badge/Portainer-Stack-13BEF9?style=flat&logo=portainer&logoColor=white" alt="Portainer Badge">
+          <img src="https://img.shields.io/badge/Healthcheck-Enabled-2EA44F?style=flat&logo=githubactions&logoColor=white" alt="Healthcheck Badge">
+          <img src="https://img.shields.io/badge/Access-LAN-orange?style=flat&logo=homeassistantcommunitystore&logoColor=white" alt="LAN Badge">
+        </div>
+      </div>
+    </header>
+
+    <main class="card">
+      <blockquote>
+        🧠 <strong>OpenHuman Core</strong> als Docker-Stack in <strong>Portainer</strong>, lokal im <strong>LAN</strong> erreichbar,
+        mit <strong>Docker-Healthcheck</strong> und <strong>Watchdog-Sidecar</strong> für Statusüberwachung.
+      </blockquote>
+
+      <h2>✨ Features</h2>
+      <ul>
+        <li>🐳 Deployment als <strong>Portainer Stack</strong> (Docker Compose)</li>
+        <li>🌐 Zugriff im LAN über <code>http://&lt;SERVER-IP&gt;:7788</code></li>
+        <li>❤️ Docker-interner <strong>Healthcheck</strong> auf <code>/health</code></li>
+        <li>👀 <strong>Watchdog-Sidecar</strong>, der den Core alle 30 Sekunden prüft und loggt</li>
+        <li>💾 Persistente Datenhaltung über Docker-Volume</li>
+        <li>🔐 RPC-Zugriff per Bearer-Token</li>
+        <li>🧩 Vorbereitung für lokale KI-Anbindung (z. B. LM Studio oder Ollama)</li>
+      </ul>
+
+      <h2>🧱 Architektur</h2>
+      <div class="mermaid">
+      flowchart LR
+          A[🖥️ Client im LAN] -->|HTTP / RPC| B[🚀 openhuman-core :7788]
+          C[👀 watchdog] -->|pollt /health| B
+          B --> D[(💾 openhuman-workspace Volume)]
+      </div>
+
+      <h2>📂 Projekt-Struktur</h2>
+      <pre><code>hAI.OpenHumanCoreLAN/
+├─ README.md              # Projektbeschreibung / Anleitung
+├─ LICENSE                # MIT-Lizenz
+├─ docker-stack.yml       # Portainer-Stack für OpenHuman Core
+├─ .env.template          # Vorlage für Umgebungsvariablen
+├─ example.env            # Beispiel-Env für schnelles Starten
+├─ compose.override.yml   # Lokale Overrides (optional)
+├─ .gitignore             # Ignore-Regeln für Git
+└─ banner.svg             # Repo-Banner / Logo
+</code></pre>
+
+      <h2>📦 Services im Stack</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Service</th>
+            <th>Port</th>
+            <th>Aufgabe</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>openhuman-core</code></td>
+            <td>7788</td>
+            <td>Rust-Backend / JSON-RPC-Server</td>
+          </tr>
+          <tr>
+            <td><code>openhuman-watchdog</code></td>
+            <td>—</td>
+            <td>Prüft <code>/health</code> alle 30 s und schreibt Status ins Log</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>❤️ Healthcheck-Konzept</h2>
+
+      <h3>1. Docker-Healthcheck</h3>
+      <p>Portainer zeigt direkt an, ob der Container <strong>healthy</strong> oder <strong>unhealthy</strong> ist. Der Healthcheck pingt <code>http://localhost:7788/health</code> im Container.</p>
+      <pre><code>healthcheck:
+  test: ["CMD", "curl", "-fsS", "--max-time", "3", "http://localhost:7788/health"]
+  interval: 30s
+  timeout: 5s
+  start_period: 20s
+  retries: 3
+</code></pre>
+
+      <h3>2. Watchdog-Sidecar</h3>
+      <p>Der Sidecar-Container prüft zusätzlich über das Docker-Netzwerk <code>http://openhuman-core:7788/health</code> und loggt den Status.</p>
+      <pre><code>docker logs -f openhuman-watchdog
+</code></pre>
+      <pre><code>[watchdog] 2026-05-17 19:00:00 OK — {"status":"ok"}
+[watchdog] 2026-05-17 19:00:30 FEHLER — Core nicht erreichbar (Exit: 1)
+</code></pre>
+
+      <h2>🚀 Deployment in Portainer</h2>
+      <ol>
+        <li><strong>Bearer-Token erzeugen</strong> (für <code>OPENHUMAN_CORE_TOKEN</code>):</li>
+      </ol>
+      <pre><code>openssl rand -hex 32
+</code></pre>
+      <ol start="2">
+        <li>Portainer öffnen → <code>Stacks</code> → <code>Add Stack</code></li>
+        <li>Stack-Name z. B. <code>hAI.OpenHumanCoreLAN</code></li>
+        <li>Inhalt von <code>docker-stack.yml</code> in den Web-Editor einfügen</li>
+        <li>Env-Variablen aus <code>.env</code> / <code>.env.template</code> setzen (mindestens <code>OPENHUMAN_CORE_TOKEN</code>)</li>
+        <li><strong>Deploy the Stack</strong> klicken</li>
+      </ol>
+
+      <h2>🌐 Zugriff im LAN</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Zweck</th>
+            <th>URL</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Healthcheck</td>
+            <td><code>http://&lt;SERVER-IP&gt;:7788/health</code></td>
+          </tr>
+          <tr>
+            <td>RPC</td>
+            <td><code>http://&lt;SERVER-IP&gt;:7788/rpc</code></td>
+          </tr>
+        </tbody>
+      </table>
+      <p>Beispiel:</p>
+      <pre><code>curl http://192.168.1.100:7788/health
+</code></pre>
+      <p>Mit Bearer-Token für RPC:</p>
+      <pre><code>curl -H "Authorization: Bearer DEIN_TOKEN" \
+     http://192.168.1.100:7788/rpc
+</code></pre>
+
+      <h2>🔐 Beispiel <code>.env</code></h2>
+      <p>Kopiere <code>.env.template</code> nach <code>.env</code> und passe die Werte an.</p>
+      <pre><code>OPENHUMAN_CORE_TOKEN=HIER_SICHERES_TOKEN_EINTRAGEN
+OPENHUMAN_CORE_PORT=7788
+BACKEND_URL=https://api.tinyhumans.ai
+
+# Optional
+JWT_TOKEN=
+OPENHUMAN_MODEL=
+OPENHUMAN_TEMPERATURE=0.7
+OPENHUMAN_WEB_SEARCH_MAX_RESULTS=5
+OPENHUMAN_WEB_SEARCH_TIMEOUT_SECS=10
+RUST_LOG=info
+RUST_BACKTRACE=0
+OPENHUMAN_ANALYTICS_ENABLED=false
+OPENHUMAN_BROWSER_ALLOW_ALL=0
+OPENHUMAN_LOG_PROMPTS=0
+OPENHUMAN_REASONING_ENABLED=
+OPENHUMAN_LOCAL_AI_TIER=
+OPENHUMAN_LM_STUDIO_BASE_URL=http://host.docker.internal:1234/v1
+OLLAMA_BIN=
+OPENHUMAN_PROXY_ENABLED=false
+OPENHUMAN_HTTP_PROXY=
+OPENHUMAN_HTTPS_PROXY=
+</code></pre>
+
+      <h2>🐳 <code>docker-stack.yml</code></h2>
+      <pre><code># ============================================================
+# OpenHuman Core — Portainer Stack für LAN-Betrieb
+# inkl. Docker-Healthcheck und Watchdog-Sidecar
+# ============================================================
+
+version: "3.9"
+
+services:
+
+  openhuman-core:
+    image: ghcr.io/tinyhumansai/openhuman-core:latest
+    container_name: openhuman-core
+    restart: unless-stopped
+
+    ports:
+      - "${OPENHUMAN_CORE_PORT:-7788}:7788"
+
+    environment:
+      OPENHUMAN_CORE_HOST: "0.0.0.0"
+      OPENHUMAN_CORE_PORT: "7788"
+      OPENHUMAN_WORKSPACE: "/home/openhuman/.openhuman"
+      OPENHUMAN_CORE_TOKEN: "${OPENHUMAN_CORE_TOKEN}"
+      BACKEND_URL: "${BACKEND_URL:-https://api.tinyhumans.ai}"
+      RUST_LOG: "${RUST_LOG:-info}"
+      RUST_BACKTRACE: "${RUST_BACKTRACE:-0}"
+      OPENHUMAN_MODEL: "${OPENHUMAN_MODEL:-}"
+      OPENHUMAN_TEMPERATURE: "${OPENHUMAN_TEMPERATURE:-0.7}"
+      OPENHUMAN_WEB_SEARCH_MAX_RESULTS: "${OPENHUMAN_WEB_SEARCH_MAX_RESULTS:-5}"
+      OPENHUMAN_ANALYTICS_ENABLED: "${OPENHUMAN_ANALYTICS_ENABLED:-false}"
+
+    volumes:
+      - openhuman-workspace:/home/openhuman/.openhuman
+
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "http://localhost:7788/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+
+    networks:
+      - openhuman-net
+
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "2.0"
+        reservations:
+          memory: 256M
+
+    labels:
+      - "com.portainer.stack=hAI.OpenHumanCoreLAN"
+      - "traefik.enable=false"
+
+  openhuman-watchdog:
+    image: alpine:latest
+    container_name: openhuman-watchdog
+    restart: unless-stopped
+    depends_on:
+      openhuman-core:
+        condition: service_healthy
+
+    command: >
+      sh -c "
+        echo '[watchdog] Starte Health-Monitoring für openhuman-core...' &&
+        while true; do
+          TIMESTAMP=$$(date '+%Y-%m-%d %H:%M:%S');
+          RESPONSE=$$(wget -q -O- --timeout=5 http://openhuman-core:7788/health 2>&1);
+          STATUS=$$?;
+          if [ $$STATUS -eq 0 ]; then
+            echo \"[watchdog] $${TIMESTAMP} OK — $${RESPONSE}\";
+          else
+            echo \"[watchdog] $${TIMESTAMP} FEHLER — Core nicht erreichbar (Exit: $${STATUS})\";
+          fi;
+          sleep 30;
+        done
+      "
+
+    networks:
+      - openhuman-net
+
+    deploy:
+      resources:
+        limits:
+          memory: 32M
+          cpus: "0.1"
+
+    labels:
+      - "com.portainer.stack=hAI.OpenHumanCoreLAN"
+
+volumes:
+  openhuman-workspace:
+    name: openhuman-workspace
+
+networks:
+  openhuman-net:
+    name: openhuman-net
+    driver: bridge
+</code></pre>
+
+      <h2>🧰 Nützliche Befehle</h2>
+      <h3>Health testen</h3>
+      <pre><code>curl http://&lt;SERVER-IP&gt;:7788/health
+</code></pre>
+
+      <h3>Core-Logs anzeigen</h3>
+      <pre><code>docker logs -f openhuman-core
+</code></pre>
+
+      <h3>Watchdog-Logs anzeigen</h3>
+      <pre><code>docker logs -f openhuman-watchdog
+</code></pre>
+
+      <h3>Backup des Volumes</h3>
+      <pre><code>docker run --rm -v openhuman-workspace:/data -v $(pwd):/backup \
+  alpine tar czf /backup/openhuman-backup-$(date +%Y%m%d).tar.gz /data
+</code></pre>
+
+      <h2>🧯 Troubleshooting</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Problem</th>
+            <th>Lösung</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Container startet nicht</td>
+            <td><code>docker logs openhuman-core</code> prüfen</td>
+          </tr>
+          <tr>
+            <td>Port 7788 ist belegt</td>
+            <td>In <code>.env</code> <code>OPENHUMAN_CORE_PORT=7789</code> setzen</td>
+          </tr>
+          <tr>
+            <td>Kein Zugriff im LAN</td>
+            <td>Firewall für TCP <code>7788</code> freigeben</td>
+          </tr>
+          <tr>
+            <td>RPC schlägt fehl</td>
+            <td><code>OPENHUMAN_CORE_TOKEN</code> prüfen</td>
+          </tr>
+          <tr>
+            <td>Watchdog startet nicht</td>
+            <td>Warten, bis <code>openhuman-core</code> healthy ist</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>📜 Lizenz (MIT)</h2>
+      <p>Dieses Projekt <strong>hAI.OpenHumanCoreLAN</strong> steht unter der MIT-Lizenz. Die vollständige Lizenz findest du in der Datei <code>LICENSE</code> im Repository.</p>
+    </main>
+
+    <footer>
+      hAI.OpenHumanCoreLAN · MIT License · GitHub Pages
+    </footer>
+  </div>
+</body>
+</html>
