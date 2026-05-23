@@ -5,7 +5,7 @@
 ![Portainer](https://img.shields.io/badge/Portainer-Stack-13BEF9?style=flat&logo=portainer&logoColor=white)
 ![Healthcheck](https://img.shields.io/badge/Healthcheck-Enabled-2EA44F?style=flat&logo=githubactions&logoColor=white)
 ![LAN](https://img.shields.io/badge/Access-LAN-orange?style=flat&logo=homeassistantcommunitystore&logoColor=white)
-
+[![Buy me a coffee](https://cdn.buymeacoffee.com/buttons/default-orange.png)](https://www.buymeacoffee.com/highfish)
 > 🧠 **OpenHuman Core** als Docker-Stack in **Portainer**, lokal im **LAN** erreichbar, mit **Docker-Healthcheck** und **Watchdog-Sidecar** für Statusüberwachung.
 
 ---
